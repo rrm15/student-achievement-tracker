@@ -34,18 +34,17 @@ stages:
         versionSpec: '20.x'
       displayName: 'Install Node.js 20.x'
 
-    - script: |
-        echo "--- SCRIPT STARTING ---"
-        npm install
-        echo "--- NPM INSTALL COMPLETE, RUNNING LINT NOW ---"
-        npm run lint
-        echo "--- LINT COMPLETE, RUNNING TESTS NOW ---"
-        npm test
-        echo "--- TESTS COMPLETE, RUNNING BUILD NOW ---"
-        npm run build
-        echo "--- SCRIPT FINISHED ---"
-      displayName: 'Install dependencies and build frontend'
-      workingDirectory: '$(frontendFolder)'
+    - task: CodeQL.ql-actions-init@1
+      displayName: 'Initialize CodeQL'
+      inputs:
+        languages: 'javascript'
+        source-root: '$(frontendFolder)'
+
+    - task: CodeQL.ql-actions-autobuild@1
+      displayName: 'CodeQL Autobuild'
+
+    - task: CodeQL.ql-actions-analyze@1
+      displayName: 'Perform CodeQL Analysis'
 
     - task: PublishPipelineArtifact@1
       displayName: 'Publish Frontend Artifact'
@@ -61,11 +60,17 @@ stages:
         versionSpec: '20.x'
       displayName: 'Install Node.js 20.x'
 
-    - script: |
-        npm install --production
-        npm test
-      displayName: 'Install server dependencies and test'
-      workingDirectory: '$(serverFolder)'
+    - task: CodeQL.ql-actions-init@1
+      displayName: 'Initialize CodeQL'
+      inputs:
+        languages: 'javascript'
+        source-root: '$(serverFolder)'
+
+    - task: CodeQL.ql-actions-autobuild@1
+      displayName: 'CodeQL Autobuild'
+
+    - task: CodeQL.ql-actions-analyze@1
+      displayName: 'Perform CodeQL Analysis'
 
     - task: ArchiveFiles@2
       displayName: 'Archive Server Files'
