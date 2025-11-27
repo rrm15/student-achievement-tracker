@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: achievement-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: achievement-backend
+  template:
+    metadata:
+      labels:
+        app: achievement-backend
+    spec:
+      containers:
+      - name: backend
+        image: achievement-tracker-backend:latest # Replace with your registry image
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - secretRef:
+            name: cosmos-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: achievement-backend
+spec:
+  selector:
+    app: achievement-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: ClusterIP
